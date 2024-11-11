@@ -9,6 +9,7 @@ import (
 	"workoutbot/internal/services"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/joho/godotenv"
 )
 
 
@@ -16,8 +17,19 @@ func main() {
 	// Project init
 	services.Hello()
 
+	// Load .env file if it exists
+	if err := godotenv.Load(); err != nil {
+		log.Println("No .env file found")
+	}
+
+	// Get the Discord token
+	discordToken := os.Getenv("DISCORD_TOKEN")
+	if discordToken == "" {
+		log.Fatal("DISCORD_TOKEN not set in environment")
+	}		
+
 	// Initialize the session and log fatal if error
-	session, err := discordgo.New("Bot MTMwNTY3MjA0OTQ2OTE2NTY0OQ.GrDeP9.sAolXfrQugdzslmL8b-oiBOMsYLaE5peUKxC2c")
+	session, err := discordgo.New(discordToken)
 	if err != nil {
 		log.Fatal((err))
 	}
