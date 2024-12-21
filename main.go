@@ -34,6 +34,7 @@ func main() {
 	services.DiscordAddReactionHandler(session)
 	services.DiscordRemoveReactionHandler(session)
 	services.DiscordMessageCreateHandler(session)
+	services.DiscordHelpMessageHandler(session)
 
 	// Set the intent
 	session.Identify.Intents = discordgo.IntentsAllWithoutPrivileged
