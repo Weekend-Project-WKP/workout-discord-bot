@@ -12,7 +12,6 @@ import (
 	"github.com/joho/godotenv"
 )
 
-
 func main() {
 	// Project init
 	services.Hello()
@@ -25,13 +24,18 @@ func main() {
 	// Get the Discord token
 	// Initialize the session and log fatal if error
 	session, errDiscord := services.InitializeDiscordGo()
+	// Initiailze AI - Currently Gemini 1.5
+	model, ctx, client, errAi := services.InitializeAiPartner()
 
 	if errDiscord != nil {
 		log.Printf("Error initializing DiscordGo: %v", errDiscord)
 	}
+	if errAi != nil {
+		log.Fatal(errAi)
+	}
 
-	// Add Discord handlers 
-	services.DiscordAddReactionHandler(session)
+	// Add Discord handlers
+	services.DiscordAddReactionHandler(session, model, ctx)
 	services.DiscordRemoveReactionHandler(session)
 	services.DiscordMessageCreateHandler(session)
 
@@ -44,7 +48,7 @@ func main() {
 		log.Fatal((errDiscord))
 	}
 	defer session.Close()
-
+	defer client.Close()
 	fmt.Println("The bot is online!")
 
 	// Create a channel to listen to system notifications in order to close up. Use CTRL + C to close
