@@ -29,10 +29,7 @@ func DiscordHelpMessageHandler(session *discordgo.Session){
 			// TODO: Pull this list from a constants file instead of inline here
 			commands := []string{
 				"list <date> \n  ex: \n   !workoutbot list 12/21/2024, (Leaving date blank defaults to today)",
-				"add",
-				"remove",
-				"jointeam",
-				"leaveteam",
+				"add <workoutcategory> <duration> <date> \n ex: \n !workoutbot add strength 1hr5m 12/21/2024 (Leaving date blank defaults to today)",
 			}
 
 			title := ""
