@@ -92,6 +92,5 @@ func getFile(fileUrl string) ([]byte, error) {
 		return nil, err
 	}
 
-	// fmt.Println(string(body)) // Print the content as a string
 	return body, nil
 }
