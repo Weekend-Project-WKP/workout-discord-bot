@@ -49,7 +49,6 @@ func DiscordAddReactionHandler(session *discordgo.Session, model *genai.Generati
 			for _, cand := range resp.Candidates {
 				if cand.Content != nil {
 					for _, part := range cand.Content.Parts {
-						// fmt.Println(part)
 						_, err := s.ChannelMessageSend(r.ChannelID, fmt.Sprintf("%v", part))
 						if err != nil {
 							fmt.Println(err)
