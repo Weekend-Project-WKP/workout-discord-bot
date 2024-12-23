@@ -1,10 +1,13 @@
 package services
 
 import (
+	"context"
 	"log"
 	"os"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/google/generative-ai-go/genai"
+	"google.golang.org/api/option"
 )
 
 func InitializeDiscordGo() (*discordgo.Session, error) {
@@ -18,4 +21,13 @@ func InitializeDiscordGo() (*discordgo.Session, error) {
 		log.Fatal((err))
 	}
 	return session, err
+}
+func InitializeAiPartner() (*genai.GenerativeModel, context.Context, *genai.Client, error) {
+	ctx := context.Background()
+	client, err := genai.NewClient(ctx, option.WithAPIKey(os.Getenv("GEMINI_API_KEY")))
+	if err != nil {
+		log.Fatal(err)
+	}
+	model := client.GenerativeModel("gemini-1.5-flash")
+	return model, ctx, client, err
 }
