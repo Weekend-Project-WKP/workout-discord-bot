@@ -26,8 +26,10 @@ $ cd workout-discord-bot
 
 2. Set Up Environment: Configure your `.env` file with the required tokens.
 ```
-DISCORD_TOKEN=
-GEMINI_API_KEY=
+DISCORD_TOKEN = <insert token>
+GEMINI_API_KEY = <insert key>
+MONGODB_PASSWORD = <insert password>
+MONGODB_USERID = <insert userid>
 ```
 
 3. Run the Bot:
