@@ -34,6 +34,9 @@ func main() {
 		log.Fatal(errAi)
 	}
 
+	// Initialize MongoDB
+	services.MongoDBInit()
+
 	// Add Discord handlers
 	services.DiscordAddReactionHandler(session, model, ctx)
 	services.DiscordRemoveReactionHandler(session)
