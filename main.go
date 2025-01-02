@@ -1,12 +1,14 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"os"
 	"os/signal"
 	"syscall"
-	"workoutbot/internal/services"
+	db "workoutbot/internal/db"
+	services "workoutbot/internal/services"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/joho/godotenv"
@@ -14,8 +16,6 @@ import (
 
 func main() {
 	// Project init
-	services.Hello()
-
 	// Load .env file if it exists
 	if err := godotenv.Load(); err != nil {
 		log.Println("No .env file found")
@@ -35,7 +35,16 @@ func main() {
 	}
 
 	// Initialize MongoDB
-	services.MongoDBInit()
+	db.MongoDBInit()
+	defer func() {
+		if err := db.MongoClient.Disconnect(context.TODO()); err != nil {
+			log.Fatalf("Failed to disconnect MongoDB client: %v", err)
+		}
+		log.Println("Disconnected from MongoDB")
+	}()
+
+	log.Printf("Entering MongoGetOneTeam")
+	db.MongoGetOneTeam("Test Team")
 
 	// Add Discord handlers
 	services.DiscordAddReactionHandler(session, model, ctx)
