@@ -30,12 +30,9 @@ func main() {
 	if errDiscord != nil {
 		log.Printf("Error initializing DiscordGo: %v", errDiscord)
 	}
-	if errAi != nil {
-		log.Fatal(errAi)
-	}
 
 	// Add Discord handlers
-	services.DiscordAddReactionHandler(session, model, ctx)
+	services.DiscordAddReactionHandler(session, model, ctx, errAi)
 	services.DiscordRemoveReactionHandler(session)
 	services.DiscordMessageCreateHandler(session)
 	services.DiscordHelpMessageHandler(session)
