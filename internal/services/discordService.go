@@ -25,9 +25,6 @@ func InitializeDiscordGo() (*discordgo.Session, error) {
 func InitializeAiPartner() (*genai.GenerativeModel, context.Context, *genai.Client, error) {
 	ctx := context.Background()
 	client, err := genai.NewClient(ctx, option.WithAPIKey(os.Getenv("GEMINI_API_KEY")))
-	if err != nil {
-		log.Fatal(err)
-	}
 	model := client.GenerativeModel("gemini-1.5-flash")
 	return model, ctx, client, err
 }

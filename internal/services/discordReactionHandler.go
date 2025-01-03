@@ -12,7 +12,7 @@ import (
 	"github.com/google/generative-ai-go/genai"
 )
 
-func DiscordAddReactionHandler(session *discordgo.Session, model *genai.GenerativeModel, ctx context.Context) {
+func DiscordAddReactionHandler(session *discordgo.Session, model *genai.GenerativeModel, ctx context.Context, aiError error) {
 	session.AddHandler(func(s *discordgo.Session, r *discordgo.MessageReactionAdd) {
 		fmt.Printf("%v reacted with %v\n", r.UserID, r.Emoji.Name)
 
@@ -22,6 +22,10 @@ func DiscordAddReactionHandler(session *discordgo.Session, model *genai.Generati
 			s.ChannelMessageSend(r.ChannelID, fmt.Sprintf("%v has been added to the %v", r.UserID, "Workout Challenge role"))
 		}
 		if r.Emoji.Name == "🧪" {
+			if aiError != nil {
+				s.ChannelMessageSend(r.ChannelID, constants.AiErrorMessage)
+				return
+			}
 			message, err := s.ChannelMessage(r.ChannelID, r.MessageID)
 			if err != nil {
 				fmt.Println(err)
