@@ -1,4 +1,4 @@
-package services
+package db
 
 import (
 	"context"
@@ -56,7 +56,7 @@ func MongoDBInit(){
 	fmt.Println(databases)
   }
 
-  // GetCollection returns a reference to a MongoDB collection
+// GetCollection returns a reference to a MongoDB collection
 func GetCollection(database, collection string) *mongo.Collection {
 	if MongoClient == nil {
 		log.Fatal("MongoDB client is not initialized. Call Connect first.")

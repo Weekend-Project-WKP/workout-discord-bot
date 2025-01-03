@@ -7,8 +7,8 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	db "workoutbot/internal/db"
-	services "workoutbot/internal/services"
+	"workoutbot/internal/db"
+	"workoutbot/internal/services"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/joho/godotenv"

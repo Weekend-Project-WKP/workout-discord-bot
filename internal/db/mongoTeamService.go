@@ -1,4 +1,4 @@
-package services
+package db
 
 import (
 	"context"
@@ -9,7 +9,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
-
 
 func MongoGetOneTeam(teamName string){
 	log.Printf("Setting DB and Collection")
