@@ -1,5 +1,7 @@
 package models
 
+import "go.mongodb.org/mongo-driver/bson/primitive"
+
 type User struct {
 	DiscordUserId int
 	Username      string
@@ -7,6 +9,6 @@ type User struct {
 }
 
 type Team struct {
-	Id       int
-	TeamName string
+	Id       primitive.ObjectID	`bson:"_id,omitempty"`
+	TeamName string 			`bson:"team_name"`
 }

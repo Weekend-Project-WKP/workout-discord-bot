@@ -43,8 +43,21 @@ func main() {
 		log.Println("Disconnected from MongoDB")
 	}()
 
-	log.Printf("Entering MongoGetOneTeam")
-	db.MongoGetOneTeam("Test Team")
+
+	// TODO: Remove example DB code when we implement the examples in one of the discord handlers
+	// team, err := db.TeamsGetOne("Test Team")
+	// if err != nil{
+	// 	log.Fatal(err)
+	// }
+	// log.Println(team.Id, team.TeamName)
+
+	// db.TeamsGetAll()
+	
+	// id, err := db.TeamsSaveOne("Saved Team")
+	// if err != nil{
+	// 	log.Println(err)
+	// }
+	// log.Printf("Saved teams ID: %v", id)
 
 	// Add Discord handlers
 	services.DiscordAddReactionHandler(session, model, ctx)
