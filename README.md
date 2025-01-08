@@ -1,3 +1,5 @@
+[![Go](https://github.com/Weekend-Project-WKP/workout-discord-bot/actions/workflows/go.yml/badge.svg)](https://github.com/Weekend-Project-WKP/workout-discord-bot/actions/workflows/go.yml)
+[![CodeQL](https://github.com/Weekend-Project-WKP/workout-discord-bot/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/Weekend-Project-WKP/workout-discord-bot/actions/workflows/github-code-scanning/codeql)
 # Workout Discord Bot
 A Discord bot written in Golang for tracking workouts over a period and generating basic reports to help users monitor their progress. Designed to be lightweight, easy to use, and fully integrated within your Discord server!
 
