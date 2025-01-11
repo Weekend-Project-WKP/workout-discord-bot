@@ -1,7 +1,7 @@
 package models
 
 type WorkoutCategory struct {
-	Id                     int
+	_id                    string
 	CategoryName           string
 	Points                 int
 	Measurement            int
