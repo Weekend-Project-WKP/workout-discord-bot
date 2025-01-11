@@ -22,7 +22,13 @@ func DiscordAddReactionHandler(session *discordgo.Session, model *genai.Generati
 				s.ChannelMessageSend(r.ChannelID, constants.AiErrorMessage)
 				break
 			}
-			reactions.ProcessWorkout(s, r, model, ctx)
+			reactions.ProcessWorkout(s, r, model, ctx, constants.AiPrompt)
+		case "Goggins":
+			if aiError != nil {
+				s.ChannelMessageSend(r.ChannelID, constants.AiErrorMessage)
+				break
+			}
+			reactions.ProcessWorkout(s, r, model, ctx, constants.DavidGoginsAiPrompt)
 		default:
 			fmt.Printf("No Add Emoji Reaction Logic for %v\n", r.Emoji.Name)
 		}
