@@ -1,3 +1,5 @@
+[![Go](https://github.com/Weekend-Project-WKP/workout-discord-bot/actions/workflows/go.yml/badge.svg)](https://github.com/Weekend-Project-WKP/workout-discord-bot/actions/workflows/go.yml)
+[![CodeQL](https://github.com/Weekend-Project-WKP/workout-discord-bot/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/Weekend-Project-WKP/workout-discord-bot/actions/workflows/github-code-scanning/codeql)
 # Workout Discord Bot
 A Discord bot written in Golang for tracking workouts over a period and generating basic reports to help users monitor their progress. Designed to be lightweight, easy to use, and fully integrated within your Discord server!
 
@@ -26,8 +28,10 @@ $ cd workout-discord-bot
 
 2. Set Up Environment: Configure your `.env` file with the required tokens.
 ```
-DISCORD_TOKEN=
-GEMINI_API_KEY=
+DISCORD_TOKEN = <insert token>
+GEMINI_API_KEY = <insert key>
+MONGODB_PASSWORD = <insert password>
+MONGODB_USERID = <insert userid>
 ```
 
 3. Run the Bot:
