@@ -58,13 +58,6 @@ func main() {
 	// }
 	// log.Printf("Saved teams ID: %v", id)
 
-	// Register the slash command
-	session.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-		if i.Type == discordgo.InteractionApplicationCommand {
-			services.HandleCommand(s, i)
-		}
-	})
-
 	// Add Discord handlers
 	services.DiscordAddReactionHandler(session, model, ctx)
 	services.DiscordRemoveReactionHandler(session)
@@ -82,25 +75,8 @@ func main() {
 	defer session.Close()
 	defer client.Close()
 
-	// Register the command with Discord
-	command := &discordgo.ApplicationCommand{
-		Name:        "hello",
-		Description: "Sends a greeting",
-		Options: []*discordgo.ApplicationCommandOption{
-			{
-				Name:        "name",
-				Description: "Your name",
-				Type:        discordgo.ApplicationCommandOptionString,
-				Required:    true,
-			},
-		},
-	}
+	services.DiscordHelpSlashCommandHandler(session)
 
-	_, errDiscord = session.ApplicationCommandCreate(session.State.User.ID, "", command)
-	if errDiscord != nil {
-		log.Fatalf("Cannot create slash command: %v", errDiscord)
-	}
-	fmt.Println(errDiscord)
 	fmt.Println("The bot is online!")
 
 	// Create a channel to listen to system notifications in order to close up. Use CTRL + C to close
