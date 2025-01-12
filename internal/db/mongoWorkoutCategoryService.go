@@ -39,6 +39,8 @@ func WorkoutCategoryGetAll() (map[string]models.WorkoutCategory, error) {
 	for _, category := range results {
 		nameToWorkoutCategoryMap[category.CategoryName] = category
 	}
-
+	if len(results) == 0 {
+		err = fmt.Errorf("no workout categories. can't log anything. sounds like no points for you. contact an admin")
+	}
 	return nameToWorkoutCategoryMap, err
 }
