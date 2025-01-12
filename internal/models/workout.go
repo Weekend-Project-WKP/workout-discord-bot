@@ -5,8 +5,8 @@ import "go.mongodb.org/mongo-driver/bson/primitive"
 type WorkoutCategory struct {
 	Id                     primitive.ObjectID `bson:"_id" json:"id,omitempty"`
 	CategoryName           string
-	Points                 int
-	Measurement            int
+	Points                 float64
+	Measurement            float64
 	MeasurementDescription string
 }
 
