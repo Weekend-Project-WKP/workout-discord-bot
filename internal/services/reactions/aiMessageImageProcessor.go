@@ -13,7 +13,10 @@ import (
 	"github.com/google/generative-ai-go/genai"
 )
 
-func WhatWouldDavidGogginsSay(s *discordgo.Session, r *discordgo.MessageReactionAdd, model *genai.GenerativeModel, ctx context.Context) {
+func WhatWouldDavidGogginsSay(s *discordgo.Session, r *discordgo.MessageReactionAdd, model *genai.GenerativeModel, ctx context.Context, aiError error) {
+	if !isAiAvailable(aiError, s, r.ChannelID) {
+		return
+	}
 	message, err := s.ChannelMessage(r.ChannelID, r.MessageID)
 	if err != nil {
 		fmt.Println(err)
@@ -24,7 +27,10 @@ func WhatWouldDavidGogginsSay(s *discordgo.Session, r *discordgo.MessageReaction
 	}
 	processMessageAndAttachment(textContext, message, r.ChannelID, s, model, ctx)
 }
-func GetAiSummary(s *discordgo.Session, r *discordgo.MessageReactionAdd, model *genai.GenerativeModel, ctx context.Context) {
+func GetAiSummary(s *discordgo.Session, r *discordgo.MessageReactionAdd, model *genai.GenerativeModel, ctx context.Context, aiError error) {
+	if !isAiAvailable(aiError, s, r.ChannelID) {
+		return
+	}
 	message, err := s.ChannelMessage(r.ChannelID, r.MessageID)
 	if err != nil {
 		fmt.Println(err)
@@ -106,4 +112,11 @@ func getTeamName(s *discordgo.Session, guildId string, userId string) (string, e
 		}
 	}
 	return "", fmt.Errorf("no team found for this user")
+}
+func isAiAvailable(aiError error, s *discordgo.Session, channelId string) bool {
+	if aiError != nil {
+		s.ChannelMessageSend(channelId, constants.AiErrorMessage)
+		return false
+	}
+	return true
 }
