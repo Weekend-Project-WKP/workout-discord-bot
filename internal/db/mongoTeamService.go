@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"time"
+	"workoutbot/internal/constants"
 	"workoutbot/internal/models"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -14,7 +15,7 @@ import (
 
 func TeamsGetOne(teamName string) (*models.Team, error) {
 	// Select the database and collection
-	teams := GetCollection("workoutbot", "teams")
+	teams := GetCollection(constants.DbName, constants.TeamsCollection)
 
 	// Define the filter for the document you want to find
 	filter := bson.M{"team_name": teamName}
@@ -42,7 +43,7 @@ func TeamsGetOne(teamName string) (*models.Team, error) {
 
 func TeamsGetAll() ([]models.Team, error) {
 	// Select the database and collection
-	teams := GetCollection("workoutbot", "teams")
+	teams := GetCollection(constants.DbName, constants.TeamsCollection)
 
 	// Define the filter for the document you want to find
 	// Empty filter = Find all documents in the collection
@@ -77,7 +78,7 @@ func TeamsGetAll() ([]models.Team, error) {
 
 func TeamsSaveOne(teamName string) (primitive.ObjectID, error) {
 	// Select the database and collection
-	teams := GetCollection("workoutbot", "teams")
+	teams := GetCollection(constants.DbName, constants.TeamsCollection)
 
 	// Context for query
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)

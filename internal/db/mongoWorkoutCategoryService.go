@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"time"
+	"workoutbot/internal/constants"
 	"workoutbot/internal/models"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -13,7 +14,7 @@ import (
 func WorkoutCategoryGetAll() (map[string]models.WorkoutCategory, error) {
 	nameToWorkoutCategoryMap := make(map[string]models.WorkoutCategory)
 	// Select the database and collection
-	workoutCategories := GetCollection("workoutbot", "workout_categories")
+	workoutCategories := GetCollection(constants.DbName, constants.WorkoutCategoryCollection)
 
 	// Define the filter for the document you want to find
 	// Empty filter = Find all documents in the collection

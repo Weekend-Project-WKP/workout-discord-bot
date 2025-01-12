@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"time"
+	"workoutbot/internal/constants"
 	"workoutbot/internal/models"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -13,7 +14,7 @@ import (
 
 func WorkoutsInsertMany(workouts []models.Workout) (*mongo.InsertManyResult, error) {
 	// Select the database and collection
-	workoutCollection := GetCollection("workoutbot", "workouts")
+	workoutCollection := GetCollection(constants.DbName, constants.WorkoutsCollection)
 
 	// Context for query
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
