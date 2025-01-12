@@ -43,7 +43,6 @@ func main() {
 		log.Println("Disconnected from MongoDB")
 	}()
 
-
 	// TODO: Remove example DB code when we implement the examples in one of the discord handlers
 	// team, err := db.TeamsGetOne("Test Team")
 	// if err != nil{
@@ -52,12 +51,19 @@ func main() {
 	// log.Println(team.Id, team.TeamName)
 
 	// db.TeamsGetAll()
-	
+
 	// id, err := db.TeamsSaveOne("Saved Team")
 	// if err != nil{
 	// 	log.Println(err)
 	// }
 	// log.Printf("Saved teams ID: %v", id)
+
+	// Register the slash command
+	session.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+		if i.Type == discordgo.InteractionApplicationCommand {
+			services.HandleCommand(s, i)
+		}
+	})
 
 	// Add Discord handlers
 	services.DiscordAddReactionHandler(session, model, ctx)
@@ -75,6 +81,26 @@ func main() {
 	}
 	defer session.Close()
 	defer client.Close()
+
+	// Register the command with Discord
+	command := &discordgo.ApplicationCommand{
+		Name:        "hello",
+		Description: "Sends a greeting",
+		Options: []*discordgo.ApplicationCommandOption{
+			{
+				Name:        "name",
+				Description: "Your name",
+				Type:        discordgo.ApplicationCommandOptionString,
+				Required:    true,
+			},
+		},
+	}
+
+	_, errDiscord = session.ApplicationCommandCreate(session.State.User.ID, "", command)
+	if errDiscord != nil {
+		log.Fatalf("Cannot create slash command: %v", errDiscord)
+	}
+	fmt.Println(errDiscord)
 	fmt.Println("The bot is online!")
 
 	// Create a channel to listen to system notifications in order to close up. Use CTRL + C to close
