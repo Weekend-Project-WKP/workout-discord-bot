@@ -1,7 +1,9 @@
 package models
 
+import "go.mongodb.org/mongo-driver/bson/primitive"
+
 type WorkoutCategory struct {
-	_id                    string
+	Id                     primitive.ObjectID `bson:"_id" json:"id,omitempty"`
 	CategoryName           string
 	Points                 int
 	Measurement            int
@@ -9,9 +11,11 @@ type WorkoutCategory struct {
 }
 
 type Workout struct {
-	Id                int
-	DiscordUserId     int
-	WorkoutCategory   int
-	ActualWorkoutTime string
+	DiscordUserName   string
+	DiscordGuildId    string
+	WorkoutCategoryId primitive.ObjectID
 	WorkoutEntryTime  string
+	MessageId         string
+	Points            float64
+	TeamName          string
 }

@@ -40,6 +40,5 @@ func WorkoutCategoryGetAll() (map[string]models.WorkoutCategory, error) {
 		nameToWorkoutCategoryMap[category.CategoryName] = category
 	}
 
-	// return results, nil
 	return nameToWorkoutCategoryMap, err
 }

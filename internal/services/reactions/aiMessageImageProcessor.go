@@ -6,47 +6,43 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strings"
 	"workoutbot/internal/constants"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/google/generative-ai-go/genai"
 )
 
-func ProcessWorkout(s *discordgo.Session, r *discordgo.MessageReactionAdd, model *genai.GenerativeModel, ctx context.Context) {
+func WhatWouldDavidGogginsSay(s *discordgo.Session, r *discordgo.MessageReactionAdd, model *genai.GenerativeModel, ctx context.Context) {
+	message, err := s.ChannelMessage(r.ChannelID, r.MessageID)
+	if err != nil {
+		fmt.Println(err)
+	}
+	textContext := constants.DavidGoginsAiPrompt
+	if message.Content != "" {
+		textContext = textContext + message.Content
+	}
+	processMessageAndAttachment(textContext, message, r.ChannelID, s, model, ctx)
+}
+func GetAiSummary(s *discordgo.Session, r *discordgo.MessageReactionAdd, model *genai.GenerativeModel, ctx context.Context) {
 	message, err := s.ChannelMessage(r.ChannelID, r.MessageID)
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	var parts []genai.Part
+	teamName, errTeamName := getTeamName(s, r.GuildID, r.UserID)
+	if errTeamName != nil {
+		fmt.Println(errTeamName)
+		s.ChannelMessageSend(r.ChannelID, "This user isn't assigned to a team. Need a team my guy/gal/they.")
+	}
+
 	textContext := constants.AiPrompt
 	if message.Content != "" {
 		textContext = textContext + message.Content
 	}
-	parts = append(parts, genai.Text(textContext))
-	if len(message.Attachments) > 0 {
-		for _, msg := range message.Attachments {
-			fileData, err := getFile(msg.URL)
-			if err != nil {
-				fmt.Println(err)
-			}
-			parts = append(parts, genai.ImageData("jpeg", fileData))
-		}
-	}
-	resp, err := model.GenerateContent(ctx, parts...)
-	if err != nil {
-		log.Fatal(err)
-	}
-	for _, cand := range resp.Candidates {
-		if cand.Content != nil {
-			for _, part := range cand.Content.Parts {
-				_, err := s.ChannelMessageSend(r.ChannelID, fmt.Sprintf("%v", part))
-				if err != nil {
-					fmt.Println(err)
-				}
-			}
-		}
-	}
+	textContext = textContext + "The team name is " + teamName + ". "
+	textContext = textContext + "The user name is " + message.Author.Username + "."
+	processMessageAndAttachment(textContext, message, r.ChannelID, s, model, ctx)
 }
 func getFile(fileUrl string) ([]byte, error) {
 	resp, err := http.Get(fileUrl)
@@ -69,4 +65,45 @@ func getFile(fileUrl string) ([]byte, error) {
 	}
 
 	return body, nil
+}
+func processMessageAndAttachment(textContext string, message *discordgo.Message, channelId string, s *discordgo.Session, model *genai.GenerativeModel, ctx context.Context) {
+	var parts []genai.Part
+	parts = append(parts, genai.Text(textContext))
+	if len(message.Attachments) > 0 {
+		for _, msg := range message.Attachments {
+			fileData, err := getFile(msg.URL)
+			if err != nil {
+				fmt.Println(err)
+			}
+			parts = append(parts, genai.ImageData("jpeg", fileData))
+		}
+	}
+	resp, err := model.GenerateContent(ctx, parts...)
+	if err != nil {
+		log.Fatal(err)
+	}
+	for _, cand := range resp.Candidates {
+		if cand.Content != nil {
+			for _, part := range cand.Content.Parts {
+				_, err := s.ChannelMessageSend(channelId, fmt.Sprintf("%v", part))
+				if err != nil {
+					fmt.Println(err)
+				}
+			}
+		}
+	}
+}
+func getTeamName(s *discordgo.Session, guildId string, userId string) (string, error) {
+	serverRoleMap := make(map[string]string)
+	roles, _ := s.GuildRoles(guildId)
+	for _, serverRole := range roles {
+		serverRoleMap[serverRole.ID] = serverRole.Name
+	}
+	member, _ := s.GuildMember(guildId, userId)
+	for _, userRole := range member.Roles {
+		if strings.Contains(serverRoleMap[userRole], "Team") {
+			return serverRoleMap[userRole], nil
+		}
+	}
+	return "", fmt.Errorf("no team found for this user")
 }
