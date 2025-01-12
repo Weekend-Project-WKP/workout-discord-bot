@@ -75,6 +75,7 @@ func main() {
 	defer session.Close()
 	defer client.Close()
 
+	// This needs to happen after the session.Open() in order for commands to be registered.
 	services.DiscordHelpSlashCommandHandler(session)
 
 	fmt.Println("The bot is online!")
