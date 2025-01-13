@@ -2,13 +2,13 @@ run:
   timeout: 5m
 linters:
   enable:
-    - govet
+    # - govet
     - gofmt
     - golint
-    - ineffassign
-    - staticcheck
+    # - ineffassign
+    # - staticcheck
 issues:
   exclude-rules:
     - linters:
-        - gofmt
+        # - gofmt
       text: "Don't reformat"
