@@ -36,7 +36,7 @@ func GetAiSummary(s *discordgo.Session, r *discordgo.MessageReactionAdd, model *
 		fmt.Println(err)
 	}
 
-	teamName, errTeamName := getTeamName(s, r.GuildID, r.UserID)
+	teamName, errTeamName := getTeamName(s, r.GuildID, message.Author.ID)
 	if errTeamName != nil {
 		fmt.Println(errTeamName)
 		s.ChannelMessageSend(r.ChannelID, "This user isn't assigned to a team. Need a team my guy/gal/they.")
