@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"time"
+	"workoutbot/internal/constants"
 	"workoutbot/internal/models"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -12,9 +13,9 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func TeamsGetOne(teamName string)(*models.Team, error){
+func TeamsGetOne(teamName string) (*models.Team, error) {
 	// Select the database and collection
-	teams := GetCollection("workoutbot", "teams")
+	teams := GetCollection(constants.DbName, constants.TeamsCollection)
 
 	// Define the filter for the document you want to find
 	filter := bson.M{"team_name": teamName}
@@ -26,11 +27,11 @@ func TeamsGetOne(teamName string)(*models.Team, error){
 	// Query for a single document
 	var team models.Team
 	err := teams.FindOne(ctx, filter).Decode(&team)
-	if err != nil{
+	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			fmt.Println("No document found with the specified filter.")
 			return nil, nil
-		} 
+		}
 		// Return other errors
 		return nil, fmt.Errorf("failed to find document: %w", err)
 	} else {
@@ -40,9 +41,9 @@ func TeamsGetOne(teamName string)(*models.Team, error){
 	return &team, nil
 }
 
-func TeamsGetAll()([]models.Team, error){
+func TeamsGetAll() ([]models.Team, error) {
 	// Select the database and collection
-	teams := GetCollection("workoutbot", "teams")
+	teams := GetCollection(constants.DbName, constants.TeamsCollection)
 
 	// Define the filter for the document you want to find
 	// Empty filter = Find all documents in the collection
@@ -75,9 +76,9 @@ func TeamsGetAll()([]models.Team, error){
 	return results, nil
 }
 
-func TeamsSaveOne(teamName string)(primitive.ObjectID, error){
+func TeamsSaveOne(teamName string) (primitive.ObjectID, error) {
 	// Select the database and collection
-	teams := GetCollection("workoutbot", "teams")
+	teams := GetCollection(constants.DbName, constants.TeamsCollection)
 
 	// Context for query
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -85,12 +86,12 @@ func TeamsSaveOne(teamName string)(primitive.ObjectID, error){
 
 	// Check if team name already exists
 	existingTeam, err := TeamsGetOne(teamName)
-	if err != nil{
+	if err != nil {
 		log.Printf("Something happened when calling \"TeamsGetOne\": %v", err)
 	}
 
 	// We don't want duplicate teams. Return a message saying the team already exists.
-	if !existingTeam.Id.IsZero(){		
+	if !existingTeam.Id.IsZero() {
 		return primitive.NilObjectID, fmt.Errorf("team name \"%v\" already exists. Try another team. Use !workoutbot teams to see the existing teams", teamName)
 	}
 

@@ -30,9 +30,6 @@ func main() {
 	if errDiscord != nil {
 		log.Printf("Error initializing DiscordGo: %v", errDiscord)
 	}
-	if errAi != nil {
-		log.Fatal(errAi)
-	}
 
 	// Initialize MongoDB
 	db.MongoDBInit()
@@ -43,7 +40,6 @@ func main() {
 		log.Println("Disconnected from MongoDB")
 	}()
 
-
 	// TODO: Remove example DB code when we implement the examples in one of the discord handlers
 	// team, err := db.TeamsGetOne("Test Team")
 	// if err != nil{
@@ -52,7 +48,7 @@ func main() {
 	// log.Println(team.Id, team.TeamName)
 
 	// db.TeamsGetAll()
-	
+
 	// id, err := db.TeamsSaveOne("Saved Team")
 	// if err != nil{
 	// 	log.Println(err)
@@ -60,7 +56,7 @@ func main() {
 	// log.Printf("Saved teams ID: %v", id)
 
 	// Add Discord handlers
-	services.DiscordAddReactionHandler(session, model, ctx)
+	services.DiscordAddReactionHandler(session, model, ctx, errAi)
 	services.DiscordRemoveReactionHandler(session)
 	services.DiscordMessageCreateHandler(session)
 	services.DiscordHelpMessageHandler(session)
@@ -75,6 +71,10 @@ func main() {
 	}
 	defer session.Close()
 	defer client.Close()
+
+	// This needs to happen after the session.Open() in order for commands to be registered.
+	services.DiscordHelpSlashCommandHandler(session)
+
 	fmt.Println("The bot is online!")
 
 	// Create a channel to listen to system notifications in order to close up. Use CTRL + C to close
