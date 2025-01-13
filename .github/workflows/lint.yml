@@ -20,8 +20,8 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
-          go-version: 1.20  # Adjust the Go version to match your project
-
+          go-version: 1.23
+        
       # Step 3: Create a bin directory
       - name: Create bin directory
         run: mkdir -p $GITHUB_WORKSPACE/bin
