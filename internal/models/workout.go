@@ -18,4 +18,5 @@ type Workout struct {
 	MessageId         string
 	Points            float64
 	TeamName          string
+	Description       string
 }

@@ -37,6 +37,7 @@ func CreateWorkoutsViaString(workoutString string, guildId string, messageId str
 						Points:            calculatePoints(workoutCategoryMap[lineItemSplit[1]].Points, workoutCategoryMap[lineItemSplit[1]].Measurement, durationInt),
 						DiscordUserName:   username,
 						DiscordGuildId:    guildId,
+						Description:       line,
 						WorkoutCategoryId: workoutCategoryMap[lineItemSplit[1]].Id,
 						MessageId:         messageId + "-" + strconv.Itoa(i),
 						WorkoutEntryTime:  messageTs.UTC().String(),
