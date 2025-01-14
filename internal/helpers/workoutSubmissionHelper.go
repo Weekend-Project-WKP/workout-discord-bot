@@ -8,6 +8,7 @@ import (
 	"workoutbot/internal/models"
 
 	"github.com/bwmarrin/discordgo"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // TODO: Make this string structure not as hard coded dependent
@@ -40,7 +41,7 @@ func CreateWorkoutsViaString(workoutString string, guildId string, messageId str
 						Description:       line,
 						WorkoutCategoryId: workoutCategoryMap[lineItemSplit[1]].Id,
 						MessageId:         messageId + "-" + strconv.Itoa(i),
-						WorkoutEntryTime:  messageTs.UTC().String(),
+						WorkoutEntryTime:  primitive.NewDateTimeFromTime(messageTs.UTC()),
 						TeamName:          teamname})
 				}
 			}
