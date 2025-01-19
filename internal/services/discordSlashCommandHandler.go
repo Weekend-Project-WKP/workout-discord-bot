@@ -42,6 +42,17 @@ func DiscordSlashCommandHandler(session *discordgo.Session) {
 						Description: "Type of workout completed",
 						Type:        discordgo.ApplicationCommandOptionString,
 						Required:    true,
+						Choices: []*discordgo.ApplicationCommandOptionChoice{
+							//go get all workout categories from database
+							{
+								Name: "Cardio",
+								Value: "cardio",
+							},
+							{
+								Name: "Strength",
+								Value: "strength",
+							},
+						},
 					},
 					{
 						Name:        "workout-duration-distance",
