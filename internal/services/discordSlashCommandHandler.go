@@ -3,6 +3,7 @@ package services
 import (
 	"fmt"
 	"log"
+	"workoutbot/internal/db"
 	"workoutbot/internal/services/slashcommands"
 
 	"github.com/bwmarrin/discordgo"
@@ -12,6 +13,11 @@ func DiscordSlashCommandHandler(session *discordgo.Session) {
 	// Register the slash command
 	session.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		handleCommand(s, i)
+
+		workoutCategories, err := db.WorkoutCategoryGetAll()
+		if err != nil {
+			log.Printf("Failed to get workout category: %v", err)
+		}
 
 		// Define multiple slash commands
 		commands := []*discordgo.ApplicationCommand{
@@ -42,17 +48,27 @@ func DiscordSlashCommandHandler(session *discordgo.Session) {
 						Description: "Type of workout completed",
 						Type:        discordgo.ApplicationCommandOptionString,
 						Required:    true,
-						Choices: []*discordgo.ApplicationCommandOptionChoice{
-							//go get all workout categories from database
-							{
-								Name: "Cardio",
-								Value: "cardio",
-							},
-							{
-								Name: "Strength",
-								Value: "strength",
-							},
-						},
+						Choices: func() []*discordgo.ApplicationCommandOptionChoice {
+							var choices []*discordgo.ApplicationCommandOptionChoice
+							for _, category := range workoutCategories {
+								choices = append(choices, &discordgo.ApplicationCommandOptionChoice{
+									Name:  category.CategoryName,
+									Value: category.CategoryName, // The value could differ if needed, e.g., an ID or slug
+								})
+							}
+							return choices
+						}(),
+						// Choices: []*discordgo.ApplicationCommandOptionChoice{
+						// 	//go get all workout categories from database and use to fill choices
+						// 	{
+						// 		Name: "Cardio",
+						// 		Value: "cardio",
+						// 	},
+						// 	{
+						// 		Name: "Strength",
+						// 		Value: "strength",
+						// 	},
+						// },
 					},
 					{
 						Name:        "workout-duration-distance",
