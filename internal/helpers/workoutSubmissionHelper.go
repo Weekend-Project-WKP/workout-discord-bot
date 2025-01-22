@@ -18,7 +18,7 @@ Category="Run/Walk" Duration/Length="1" mile
 Category="Sports" Duration/Length="15" minutes
 */
 func CreateWorkoutsViaString(workoutString string, guildId string, messageId string, messageTs time.Time) ([]models.Workout, error) {
-	workoutCategoryMap, err := getAllWorkoutCategories()
+	workoutCategoryMap, err := db.WorkoutCategoryGetAll()
 	var workouts []models.Workout
 	if err == nil {
 		username, teamname := "", ""
@@ -35,7 +35,7 @@ func CreateWorkoutsViaString(workoutString string, guildId string, messageId str
 					// Following Lines for Workouts
 					durationInt, _ := strconv.ParseFloat(lineItemSplit[3], 64)
 					workouts = append(workouts, models.Workout{
-						Points:            calculatePoints(workoutCategoryMap[lineItemSplit[1]].Points, workoutCategoryMap[lineItemSplit[1]].Measurement, durationInt),
+						Points:            CalculatePoints(workoutCategoryMap[lineItemSplit[1]].Points, workoutCategoryMap[lineItemSplit[1]].Measurement, durationInt),
 						DiscordUserName:   username,
 						DiscordGuildId:    guildId,
 						Description:       line,
@@ -67,10 +67,6 @@ func LogWorkouts(s *discordgo.Session, workouts []models.Workout, channelId stri
 	}
 }
 
-func getAllWorkoutCategories() (map[string]models.WorkoutCategory, error) {
-	return db.WorkoutCategoryGetAll()
-}
-
-func calculatePoints(categoryPoint float64, categoryPointInterval float64, workoutLength float64) float64 {
+func CalculatePoints(categoryPoint float64, categoryPointInterval float64, workoutLength float64) float64 {
 	return float64((workoutLength / categoryPointInterval) * categoryPoint)
 }
