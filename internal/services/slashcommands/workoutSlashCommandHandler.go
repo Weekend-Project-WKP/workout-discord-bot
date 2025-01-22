@@ -80,7 +80,8 @@ func WorkoutSlashCommandHandler(s *discordgo.Session, i *discordgo.InteractionCr
 	var workouts []models.Workout
 	workouts = append(workouts, workout)
 
+	// Log the workout to the DB
 	helpers.LogWorkouts(s, workouts, i.ChannelID, teamName)
 
-	s.ChannelMessageSend(i.ChannelID, fmt.Sprintf("Workout logged for User '%v' on Team '%v'", username, teamName))
+	s.ChannelMessageSend(i.ChannelID, fmt.Sprintf("Workout logged for User '%v' on Team '%v' Start a thread on your request and contact and admin if you need to adjust your workout", username, teamName))
 }

@@ -58,17 +58,6 @@ func DiscordSlashCommandHandler(session *discordgo.Session) {
 							}
 							return choices
 						}(),
-						// Choices: []*discordgo.ApplicationCommandOptionChoice{
-						// 	//go get all workout categories from database and use to fill choices
-						// 	{
-						// 		Name: "Cardio",
-						// 		Value: "cardio",
-						// 	},
-						// 	{
-						// 		Name: "Strength",
-						// 		Value: "strength",
-						// 	},
-						// },
 					},
 					{
 						Name:        "workout-duration-distance",
@@ -99,9 +88,6 @@ func handleCommand(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			slashcommands.HelloSlashCommandHandler(s, i)
 		case "workout":
 			log.Printf("Enter workout slash command")
-			slashcommands.WorkoutSlashCommandHandler(s, i)
-		case "goodbye":
-			log.Printf("Enter goodbye slash command")
 			slashcommands.WorkoutSlashCommandHandler(s, i)
 		default:
 			fmt.Printf("No slash command found for %v\n", i.ApplicationCommandData().Name)
