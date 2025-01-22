@@ -42,27 +42,29 @@ func WorkoutSlashCommandHandler(s *discordgo.Session, i *discordgo.InteractionCr
 	username := i.Member.User.Username
 	points := helpers.CalculatePoints(workoutCategory.Points, workoutCategory.Measurement, measurement)
 
-	description := fmt.Sprintf("Category='%v' for Duration/Length='%v' %v", category, measurement, workoutCategory.MeasurementDescription)
+	description := fmt.Sprintf("User `%v` logged a workout \n Category='%v' \n Duration/Length='%v' \n Points: '%v' \n Team='%v'", username, category, measurement, points, teamName)
 
 	// Respond with a summary of the points added
 	errInteraction := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
-			Content: fmt.Sprintf("Workout Added! %v", description),
+			Content: fmt.Sprintf("%v added a workout!", username),
 		},
 	})
 
+	if errInteraction != nil {
+		log.Printf("Error responding to slash command: %v", errInteraction)
+	}
+
 	// Fetch the message ID from the follow-up response
 	followUpMessage, err := s.FollowupMessageCreate(i.Interaction, true, &discordgo.WebhookParams{
-		Content: "Follow-up message to get the ID.",
+		Content: fmt.Sprintf("Workout Summary \n %v", description),
 	})
 	if err != nil {
 		fmt.Println("Error creating follow-up message:", err)
+		s.ChannelMessageSend(i.ChannelID, fmt.Sprintf("'%v' There was an issue logging your workout. Please contact an admin for assistance", username))
 		return
 	}
-
-	// Print the message ID of the follow-up message
-	fmt.Printf("Message ID of the follow-up: %s\n", followUpMessage.ID)
 	
 	// Create a new team document
 	workout := models.Workout{
@@ -75,11 +77,10 @@ func WorkoutSlashCommandHandler(s *discordgo.Session, i *discordgo.InteractionCr
 		TeamName: teamName,
 		Description: description,
 	}
+	var workouts []models.Workout
+	workouts = append(workouts, workout)
 
-	s.ChannelMessageSend(i.ChannelID, fmt.Sprintf("-----Workout Debug----- UserName: %v DiscordGuildId: %v WorkoutCategoryId: %v WorkoutEntryTime: %v MessageId: %v Points: %v TeamName: %v Description: %v", 
-	workout.DiscordUserName, workout.DiscordGuildId, workout.WorkoutCategoryId, workout.WorkoutEntryTime, workout.MessageId, workout.Points, workout.TeamName, workout.Description))
+	helpers.LogWorkouts(s, workouts, i.ChannelID, teamName)
 
-	if errInteraction != nil {
-		log.Printf("Error responding to slash command: %v", errInteraction)
-	}
+	s.ChannelMessageSend(i.ChannelID, fmt.Sprintf("Workout logged for User '%v' on Team '%v'", username, teamName))
 }
