@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"workoutbot/internal/constants"
 	"workoutbot/internal/helpers"
@@ -17,6 +16,7 @@ func WhatWouldDavidGogginsSay(s *discordgo.Session, r *discordgo.MessageReaction
 	if !isAiAvailable(aiError, s, r.ChannelID) {
 		return
 	}
+	panic("test")
 	message, err := s.ChannelMessage(r.ChannelID, r.MessageID)
 	if err != nil {
 		fmt.Println(err)
@@ -86,7 +86,7 @@ func processMessageAndAttachment(textContext string, message *discordgo.Message,
 	}
 	resp, err := model.GenerateContent(ctx, parts...)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 	for _, cand := range resp.Candidates {
 		if cand.Content != nil {
