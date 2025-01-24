@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 	"time"
@@ -18,7 +19,7 @@ Category="Run/Walk" Duration/Length="1" mile
 Category="Sports" Duration/Length="15" minutes
 */
 func CreateWorkoutsViaString(workoutString string, guildId string, messageId string, messageTs time.Time) ([]models.Workout, error) {
-	workoutCategoryMap, err := getAllWorkoutCategories()
+	workoutCategoryMap, err := db.WorkoutCategoryGetAll()
 	var workouts []models.Workout
 	if err == nil {
 		username, teamname := "", ""
@@ -35,7 +36,7 @@ func CreateWorkoutsViaString(workoutString string, guildId string, messageId str
 					// Following Lines for Workouts
 					durationInt, _ := strconv.ParseFloat(lineItemSplit[3], 64)
 					workouts = append(workouts, models.Workout{
-						Points:            calculatePoints(workoutCategoryMap[lineItemSplit[1]].Points, workoutCategoryMap[lineItemSplit[1]].Measurement, durationInt),
+						Points:            CalculatePoints(workoutCategoryMap[lineItemSplit[1]].Points, workoutCategoryMap[lineItemSplit[1]].Measurement, durationInt),
 						DiscordUserName:   username,
 						DiscordGuildId:    guildId,
 						Description:       line,
@@ -67,10 +68,21 @@ func LogWorkouts(s *discordgo.Session, workouts []models.Workout, channelId stri
 	}
 }
 
-func getAllWorkoutCategories() (map[string]models.WorkoutCategory, error) {
-	return db.WorkoutCategoryGetAll()
+func CalculatePoints(categoryPoint float64, categoryPointInterval float64, workoutLength float64) float64 {
+	return float64((workoutLength / categoryPointInterval) * categoryPoint)
 }
 
-func calculatePoints(categoryPoint float64, categoryPointInterval float64, workoutLength float64) float64 {
-	return float64((workoutLength / categoryPointInterval) * categoryPoint)
+func GetTeamName(s *discordgo.Session, guildId string, userId string) (string, error) {
+	serverRoleMap := make(map[string]string)
+	roles, _ := s.GuildRoles(guildId)
+	for _, serverRole := range roles {
+		serverRoleMap[serverRole.ID] = serverRole.Name
+	}
+	member, _ := s.GuildMember(guildId, userId)
+	for _, userRole := range member.Roles {
+		if strings.Contains(serverRoleMap[userRole], "Team") {
+			return serverRoleMap[userRole], nil
+		}
+	}
+	return "", fmt.Errorf("no team found for this user")
 }

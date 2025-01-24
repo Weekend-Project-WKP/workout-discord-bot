@@ -9,6 +9,7 @@ import (
 	"workoutbot/internal/models"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 func WorkoutCategoryGetAll() (map[string]models.WorkoutCategory, error) {
@@ -44,4 +45,32 @@ func WorkoutCategoryGetAll() (map[string]models.WorkoutCategory, error) {
 		err = fmt.Errorf("no workout categories. can't log anything. sounds like no points for you. contact an admin")
 	}
 	return nameToWorkoutCategoryMap, err
+}
+
+func WorkoutCategoryGetOne(category string) (*models.WorkoutCategory, error) {
+	// Select the database and collection
+	workoutCategories := GetCollection(constants.DbName, constants.WorkoutCategoryCollection)
+
+	// Define the filter for the document you want to find
+	filter := bson.M{"CategoryName": category}
+
+	// Context for query
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	// Query for a single document
+	var workout models.WorkoutCategory
+	err := workoutCategories.FindOne(ctx, filter).Decode(&workout)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			fmt.Println("No document found with the specified filter.")
+			return nil, nil
+		}
+		// Return other errors
+		return nil, fmt.Errorf("failed to find document: %w", err)
+	} else {
+		fmt.Println("Workout category found: ", workout.CategoryName)
+	}
+
+	return &workout, nil
 }

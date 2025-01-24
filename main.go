@@ -40,21 +40,6 @@ func main() {
 		log.Println("Disconnected from MongoDB")
 	}()
 
-	// TODO: Remove example DB code when we implement the examples in one of the discord handlers
-	// team, err := db.TeamsGetOne("Test Team")
-	// if err != nil{
-	// 	log.Fatal(err)
-	// }
-	// log.Println(team.Id, team.TeamName)
-
-	// db.TeamsGetAll()
-
-	// id, err := db.TeamsSaveOne("Saved Team")
-	// if err != nil{
-	// 	log.Println(err)
-	// }
-	// log.Printf("Saved teams ID: %v", id)
-
 	// Add Discord handlers
 	services.DiscordAddReactionHandler(session, model, ctx, errAi)
 	services.DiscordRemoveReactionHandler(session)
@@ -73,7 +58,7 @@ func main() {
 	defer client.Close()
 
 	// This needs to happen after the session.Open() in order for commands to be registered.
-	services.DiscordHelpSlashCommandHandler(session)
+	services.DiscordSlashCommandHandler(session)
 
 	fmt.Println("The bot is online!")
 

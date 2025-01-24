@@ -6,8 +6,8 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"strings"
 	"workoutbot/internal/constants"
+	"workoutbot/internal/helpers"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/google/generative-ai-go/genai"
@@ -36,7 +36,7 @@ func GetAiSummary(s *discordgo.Session, r *discordgo.MessageReactionAdd, model *
 		fmt.Println(err)
 	}
 
-	teamName, errTeamName := getTeamName(s, r.GuildID, message.Author.ID)
+	teamName, errTeamName := helpers.GetTeamName(s, r.GuildID, message.Author.ID)
 	if errTeamName != nil {
 		fmt.Println(errTeamName)
 		s.ChannelMessageSend(r.ChannelID, "This user isn't assigned to a team. Need a team my guy/gal/they.")
@@ -99,20 +99,7 @@ func processMessageAndAttachment(textContext string, message *discordgo.Message,
 		}
 	}
 }
-func getTeamName(s *discordgo.Session, guildId string, userId string) (string, error) {
-	serverRoleMap := make(map[string]string)
-	roles, _ := s.GuildRoles(guildId)
-	for _, serverRole := range roles {
-		serverRoleMap[serverRole.ID] = serverRole.Name
-	}
-	member, _ := s.GuildMember(guildId, userId)
-	for _, userRole := range member.Roles {
-		if strings.Contains(serverRoleMap[userRole], "Team") {
-			return serverRoleMap[userRole], nil
-		}
-	}
-	return "", fmt.Errorf("no team found for this user")
-}
+
 func isAiAvailable(aiError error, s *discordgo.Session, channelId string) bool {
 	if aiError != nil {
 		s.ChannelMessageSend(channelId, constants.AiErrorMessage)
