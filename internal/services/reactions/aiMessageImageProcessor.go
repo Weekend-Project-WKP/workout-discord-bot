@@ -16,7 +16,6 @@ func WhatWouldDavidGogginsSay(s *discordgo.Session, r *discordgo.MessageReaction
 	if !isAiAvailable(aiError, s, r.ChannelID) {
 		return
 	}
-	panic("test")
 	message, err := s.ChannelMessage(r.ChannelID, r.MessageID)
 	if err != nil {
 		fmt.Println(err)
