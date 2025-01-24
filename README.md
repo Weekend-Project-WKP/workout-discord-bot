@@ -9,16 +9,11 @@ A Discord bot written in Golang for tracking workouts over a period and generati
 * User-Friendly Commands: Simple commands to add, edit, or delete workouts and view stats.
 * Customizable Time Periods: Choose specific dates or periods to view workout summaries.
 
-## Commands
-* !workoutsummary [time period] - Generate a report for a specific time period (e.g., weekly, monthly).
-* !editworkout [workout ID] [new details] - Edit an existing workout entry.
-* !deleteworkout [workout ID] - Delete a workout entry.
-
 ## Slash Commands
 * /workout [workout-category][workout-duration] - Log a new workout for the current day for the current user
 
 ## Emoji Reactions
-* 🧪 - Triggers Ai to interpret the reacted message (with or without images) to provide a workout score
+* :AI: - Triggers Ai to interpret the reacted message (with or without images) to provide a workout score
 * ✅ - Calculates points and Adds a workout summary to the DB
 * 💪🏿 - Adds and removes the "Workout Challenge role" to the user that the emoji was reacted to
 

@@ -8,7 +8,6 @@ import (
 	"workoutbot/internal/db"
 	"workoutbot/internal/helpers"
 	"workoutbot/internal/models"
-	"workoutbot/internal/services/reactions"
 
 	"github.com/bwmarrin/discordgo"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -23,7 +22,7 @@ func WorkoutSlashCommandHandler(s *discordgo.Session, i *discordgo.InteractionCr
 	}
 
 	// Get the measurement from the 2nd slash command option
-	measurement, errMeasurment := strconv.ParseFloat(i.ApplicationCommandData().Options[1].StringValue(), 64)
+	measurement, errMeasurment := strconv.ParseFloat(i.ApplicationCommandData().Options[1].StringValue(), 64) //TODO: Update to pull from a Number Value once the SlashComandHandler is updated
 	if errMeasurment != nil {
 		fmt.Println("Error converting measurement string to float:", errMeasurment)
 		return
@@ -33,9 +32,8 @@ func WorkoutSlashCommandHandler(s *discordgo.Session, i *discordgo.InteractionCr
 	log.Printf("Interaction Message Author Id: '%v'", i.Member.User.ID)
 	
 	// Get the user team name which is set to the current user role (guild id)
-	teamName, errTeamName := reactions.GetTeamName(s, i.GuildID, i.Member.User.ID)
+	teamName, errTeamName := helpers.GetTeamName(s, i.GuildID, i.Member.User.ID)
 	if errTeamName != nil {
-		fmt.Println(errTeamName)
 		s.ChannelMessageSend(i.ChannelID, "This user isn't assigned to a team. Need a team my guy/gal/they.")
 	}
 

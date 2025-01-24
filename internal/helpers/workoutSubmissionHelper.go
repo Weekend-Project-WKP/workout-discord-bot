@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 	"time"
@@ -69,4 +70,19 @@ func LogWorkouts(s *discordgo.Session, workouts []models.Workout, channelId stri
 
 func CalculatePoints(categoryPoint float64, categoryPointInterval float64, workoutLength float64) float64 {
 	return float64((workoutLength / categoryPointInterval) * categoryPoint)
+}
+
+func GetTeamName(s *discordgo.Session, guildId string, userId string) (string, error) {
+	serverRoleMap := make(map[string]string)
+	roles, _ := s.GuildRoles(guildId)
+	for _, serverRole := range roles {
+		serverRoleMap[serverRole.ID] = serverRole.Name
+	}
+	member, _ := s.GuildMember(guildId, userId)
+	for _, userRole := range member.Roles {
+		if strings.Contains(serverRoleMap[userRole], "Team") {
+			return serverRoleMap[userRole], nil
+		}
+	}
+	return "", fmt.Errorf("no team found for this user")
 }

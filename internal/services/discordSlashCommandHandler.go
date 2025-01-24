@@ -17,28 +17,11 @@ func DiscordSlashCommandHandler(session *discordgo.Session) {
 		workoutCategories, err := db.WorkoutCategoryGetAll()
 		if err != nil {
 			log.Printf("Failed to get workout category: %v", err)
+			return
 		}
 
 		// Define multiple slash commands
 		commands := []*discordgo.ApplicationCommand{
-			{
-				Name:        "hello",
-				Description: "Sends a greeting",
-				Options: []*discordgo.ApplicationCommandOption{
-					{
-						Name:        "name",
-						Description: "Your name",
-						Type:        discordgo.ApplicationCommandOptionString,
-						Required:    true,
-					},
-					{
-						Name:        "age",
-						Description: "Your age",
-						Type:        discordgo.ApplicationCommandOptionInteger,
-						Required:    true,
-					},
-				},
-			},
 			{
 				Name:        "workout",
 				Description: "Adds a new workout for the current day",
@@ -62,7 +45,7 @@ func DiscordSlashCommandHandler(session *discordgo.Session) {
 					{
 						Name:        "workout-duration-distance",
 						Description: "Distance or Duration of the workout",
-						Type:        discordgo.ApplicationCommandOptionString,
+						Type:        discordgo.ApplicationCommandOptionString, // TODO: Use discordgo.ApplicationCommandOptionNumber so it forces a number
 						Required:    true,
 					},
 				},
@@ -83,9 +66,6 @@ func DiscordSlashCommandHandler(session *discordgo.Session) {
 func handleCommand(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	
 	switch i.ApplicationCommandData().Name{
-		case "hello":
-			log.Printf("Enter hello slash command")
-			slashcommands.HelloSlashCommandHandler(s, i)
 		case "workout":
 			log.Printf("Enter workout slash command")
 			slashcommands.WorkoutSlashCommandHandler(s, i)
