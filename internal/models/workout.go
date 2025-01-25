@@ -5,11 +5,12 @@ import (
 )
 
 type WorkoutCategory struct {
-	Id                     primitive.ObjectID `bson:"_id" json:"id,omitempty"`
-	CategoryName           string
-	Points                 float64
-	Measurement            float64
-	MeasurementDescription string
+	Id                        primitive.ObjectID `bson:"_id" json:"id,omitempty"`
+	CategoryName              string
+	Points                    float64
+	Measurement               float64
+	MeasurementDescription    string
+	MeasurementQuantification string
 }
 
 type Workout struct {
