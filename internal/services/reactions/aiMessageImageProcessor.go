@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"workoutbot/internal/constants"
+	"workoutbot/internal/db"
 	"workoutbot/internal/helpers"
 
 	"github.com/bwmarrin/discordgo"
@@ -41,7 +42,7 @@ func GetAiSummary(s *discordgo.Session, r *discordgo.MessageReactionAdd, model *
 		s.ChannelMessageSend(r.ChannelID, "This user isn't assigned to a team. Need a team my guy/gal/they.")
 	}
 
-	textContext := constants.AiPrompt
+	textContext := constants.AiPrompt + getCategoriesForAiPrompt()
 	if message.Content != "" {
 		textContext = textContext + message.Content
 	}
@@ -105,4 +106,13 @@ func isAiAvailable(aiError error, s *discordgo.Session, channelId string) bool {
 		return false
 	}
 	return true
+}
+
+func getCategoriesForAiPrompt() string {
+	runningCategoryPrompt := "The categories are:  "
+	workoutCategoryMap, _ := db.WorkoutCategoryGetAll()
+	for _, value := range workoutCategoryMap {
+		runningCategoryPrompt += value.CategoryName + " measured in " + value.MeasurementQuantification + ". "
+	}
+	return runningCategoryPrompt
 }
