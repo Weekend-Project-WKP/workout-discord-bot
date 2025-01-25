@@ -7,8 +7,9 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-func DiscordHelpMessageHandler(session *discordgo.Session){
-	session.AddHandler(func(s *discordgo.Session, m *discordgo.MessageCreate){
+func DiscordHelpMessageHandler() {
+	DiscordSession.AddHandler(func(s *discordgo.Session, m *discordgo.MessageCreate) {
+		defer FatalSessionClosing()
 		// If author of message is the same as the session author ignore the message
 		if m.Author.ID == s.State.User.ID {
 			return
@@ -33,21 +34,21 @@ func DiscordHelpMessageHandler(session *discordgo.Session){
 			}
 
 			title := ""
-			for i := 0; i <= len(commands) - 1; i++ {
+			for i := 0; i <= len(commands)-1; i++ {
 				title += commands[i] + "\n \n"
 			}
 
 			// Create embed message author
 			author := discordgo.MessageEmbedAuthor{
 				Name: "Commands Help Page (Click Me for more info)",
-				URL: "https://github.com/Weekend-Project-WKP/workout-discord-bot/blob/main/README.md#commands",
+				URL:  "https://github.com/Weekend-Project-WKP/workout-discord-bot/blob/main/README.md#commands",
 			}
 
 			// Create embed message content
 			embed := discordgo.MessageEmbed{
-				Title: title,
+				Title:  title,
 				Author: &author,
-				Color: 0xff5733, 
+				Color:  0xff5733,
 			}
 			s.ChannelMessageSendEmbed(m.ChannelID, &embed)
 		}

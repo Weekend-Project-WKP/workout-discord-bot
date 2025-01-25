@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"workoutbot/internal/constants"
 	"workoutbot/internal/helpers"
@@ -86,7 +85,7 @@ func processMessageAndAttachment(textContext string, message *discordgo.Message,
 	}
 	resp, err := model.GenerateContent(ctx, parts...)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 	for _, cand := range resp.Candidates {
 		if cand.Content != nil {

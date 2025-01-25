@@ -8,9 +8,10 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-func DiscordMessageCreateHandler(session *discordgo.Session) {
+func DiscordMessageCreateHandler() {
 	// Process incomming message request
-	session.AddHandler(func(s *discordgo.Session, m *discordgo.MessageCreate){
+	DiscordSession.AddHandler(func(s *discordgo.Session, m *discordgo.MessageCreate) {
+		defer FatalSessionClosing()
 		// If author of message is the same as the session author ignore the message
 		if m.Author.ID == s.State.User.ID {
 			return
@@ -59,20 +60,20 @@ func DiscordMessageCreateHandler(session *discordgo.Session) {
 			// Create embed message author
 			author := discordgo.MessageEmbedAuthor{
 				Name: "Rob Pike",
-				URL: "https://go-proverbs.github.io/",
+				URL:  "https://go-proverbs.github.io/",
 			}
 
 			// Create embed message content
 			embed := discordgo.MessageEmbed{
-				Title: proverbs[selection],
+				Title:  proverbs[selection],
 				Author: &author,
 			}
 
 			s.ChannelMessageSendEmbed(m.ChannelID, &embed)
 			//s.ChannelMessageSend(m.ChannelID, proverbs[selection])
-		}		
+		}
 
-		// If the sub command is "chill" respond "cousin" 
+		// If the sub command is "chill" respond "cousin"
 		if args[1] == "chill" {
 			s.ChannelMessageSend(m.ChannelID, "cousin!")
 		}

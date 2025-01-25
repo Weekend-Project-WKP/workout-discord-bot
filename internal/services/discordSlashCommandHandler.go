@@ -9,9 +9,10 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-func DiscordSlashCommandHandler(session *discordgo.Session) {
+func DiscordSlashCommandHandler() {
 	// Register the slash command
-	session.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+	DiscordSession.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+		defer FatalSessionClosing()
 		handleCommand(s, i)
 
 		workoutCategories, err := db.WorkoutCategoryGetAll()
@@ -64,12 +65,11 @@ func DiscordSlashCommandHandler(session *discordgo.Session) {
 }
 
 func handleCommand(s *discordgo.Session, i *discordgo.InteractionCreate) {
-	
-	switch i.ApplicationCommandData().Name{
-		case "workout":
-			log.Printf("Enter workout slash command")
-			slashcommands.WorkoutSlashCommandHandler(s, i)
-		default:
-			fmt.Printf("No slash command found for %v\n", i.ApplicationCommandData().Name)
-		}	
+	switch i.ApplicationCommandData().Name {
+	case "workout":
+		log.Printf("Enter workout slash command")
+		slashcommands.WorkoutSlashCommandHandler(s, i)
+	default:
+		fmt.Printf("No slash command found for %v\n", i.ApplicationCommandData().Name)
+	}
 }

@@ -23,9 +23,9 @@ func main() {
 
 	// Get the Discord token
 	// Initialize the session and log fatal if error
-	session, errDiscord := services.InitializeDiscordGo()
+	errDiscord := services.InitializeDiscordGo()
 	// Initiailze AI - Currently Gemini 1.5
-	model, ctx, client, errAi := services.InitializeAiPartner()
+	services.InitializeAiPartner()
 
 	if errDiscord != nil {
 		log.Printf("Error initializing DiscordGo: %v", errDiscord)
@@ -41,25 +41,29 @@ func main() {
 	}()
 
 	// Add Discord handlers
-	services.DiscordAddReactionHandler(session, model, ctx, errAi)
-	services.DiscordRemoveReactionHandler(session)
-	services.DiscordMessageCreateHandler(session)
-	services.DiscordHelpMessageHandler(session)
+	services.DiscordAddReactionHandler()
+	services.DiscordRemoveReactionHandler()
+	services.DiscordMessageCreateHandler()
+	services.DiscordHelpMessageHandler()
 
 	// Set the intent
-	session.Identify.Intents = discordgo.IntentsAllWithoutPrivileged
+	services.DiscordSession.Identify.Intents = discordgo.IntentsAllWithoutPrivileged
 
 	// Open the Session
-	errDiscord = session.Open()
+	errDiscord = services.DiscordSession.Open()
 	if errDiscord != nil {
 		log.Fatal((errDiscord))
 	}
-	defer session.Close()
-	defer client.Close()
+	defer services.DiscordSession.Close()
+	defer services.AiClient.Close()
+	defer func() {
+		services.DiscordSession.ChannelMessageSend("898225507064250420", "The Bot is Offline from Main.go Ending")
+	}()
 
 	// This needs to happen after the session.Open() in order for commands to be registered.
-	services.DiscordSlashCommandHandler(session)
+	services.DiscordSlashCommandHandler()
 
+	services.DiscordSession.ChannelMessageSend("898225507064250420", "The bot is online!")
 	fmt.Println("The bot is online!")
 
 	// Create a channel to listen to system notifications in order to close up. Use CTRL + C to close
