@@ -16,4 +16,5 @@ const (
 	PeriodEndDay        = "sunday"
 	Prefix              = "!workoutbot"
 	DavidGoginsAiPrompt = "Make fun of the workout or message in a way david goggins would."
+	WorkoutGangServerId = "898225376642338846"
 )

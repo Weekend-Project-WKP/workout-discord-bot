@@ -3,6 +3,7 @@ package services
 import (
 	"fmt"
 	"log"
+	"workoutbot/internal/constants"
 	"workoutbot/internal/db"
 	"workoutbot/internal/services/slashcommands"
 
@@ -19,6 +20,21 @@ func DiscordSlashCommandHandler() {
 		if err != nil {
 			log.Printf("Failed to get workout category: %v", err)
 			return
+		}
+
+		// Get all current discord users
+		// Fetch members in the guild
+		members, err := s.GuildMembers(constants.WorkoutGangServerId, "", 1000) // Fetch up to 1000 members
+		if err != nil {
+			log.Printf("Error fetching guild members: %v", err)
+		}
+
+		// Filter out bots
+		var userList []string
+		for _, member := range members {
+			if !member.User.Bot { // Exclude bots
+				userList = append(userList, member.User.Username)
+			}
 		}
 
 		// Define multiple slash commands
@@ -48,6 +64,22 @@ func DiscordSlashCommandHandler() {
 						Description: "Distance or Duration of the workout",
 						Type:        discordgo.ApplicationCommandOptionString, // TODO: Use discordgo.ApplicationCommandOptionNumber so it forces a number
 						Required:    true,
+					},
+					{
+						Name: "user",
+						Description: "User who completed the workout",
+						Type: discordgo.ApplicationCommandOptionString,
+						Required: false,
+						Choices: func() []*discordgo.ApplicationCommandOptionChoice {
+							var choices []*discordgo.ApplicationCommandOptionChoice
+							for _, user := range userList {
+								choices = append(choices, &discordgo.ApplicationCommandOptionChoice{
+									Name:  user,
+									Value: user, // The value could differ if needed, e.g., an ID or slug
+								})
+							}
+							return choices
+						}(),
 					},
 				},
 			},
