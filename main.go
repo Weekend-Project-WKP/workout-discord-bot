@@ -61,6 +61,7 @@ func main() {
 	}()
 
 	// This needs to happen after the session.Open() in order for commands to be registered.
+	services.RegisterCommands()
 	services.DiscordSlashCommandHandler()
 
 	services.DiscordSession.ChannelMessageSend("898225507064250420", "The bot is online!")

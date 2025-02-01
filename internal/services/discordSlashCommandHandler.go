@@ -15,85 +15,90 @@ func DiscordSlashCommandHandler() {
 	DiscordSession.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		defer FatalSessionClosing()
 		handleCommand(s, i)
+	})
+}
 
-		workoutCategories, err := db.WorkoutCategoryGetAll()
-		if err != nil {
-			log.Printf("Failed to get workout category: %v", err)
-			return
+func RegisterCommands() error {
+	// Fetch workout categories
+	workoutCategories, err := db.WorkoutCategoryGetAll()
+	if err != nil {
+		return fmt.Errorf("failed to get workout category: %v", err)
+	}
+
+	// Fetch members in the guild
+	members, err := DiscordSession.GuildMembers(constants.WorkoutGangServerId, "", 1000)
+	if err != nil {
+		return fmt.Errorf("error fetching guild members: %v", err)
+	}
+
+	// Filter out bots
+	var userList []string
+	for _, member := range members {
+		if !member.User.Bot {
+			userList = append(userList, member.User.Username)
 		}
+	}
 
-		// Get all current discord users
-		// Fetch members in the guild
-		members, err := s.GuildMembers(constants.WorkoutGangServerId, "", 1000) // Fetch up to 1000 members
-		if err != nil {
-			log.Printf("Error fetching guild members: %v", err)
-		}
-
-		// Filter out bots
-		var userList []string
-		for _, member := range members {
-			if !member.User.Bot { // Exclude bots
-				userList = append(userList, member.User.Username)
-			}
-		}
-
-		// Define multiple slash commands
-		commands := []*discordgo.ApplicationCommand{
-			{
-				Name:        "workout",
-				Description: "Adds a new workout for the current day",
-				Options: []*discordgo.ApplicationCommandOption{
-					{
-						Name:        "workout-category",
-						Description: "Type of workout completed",
-						Type:        discordgo.ApplicationCommandOptionString,
-						Required:    true,
-						Choices: func() []*discordgo.ApplicationCommandOptionChoice {
-							var choices []*discordgo.ApplicationCommandOptionChoice
-							for _, category := range workoutCategories {
-								choices = append(choices, &discordgo.ApplicationCommandOptionChoice{
-									Name:  category.CategoryName,
-									Value: category.CategoryName, // The value could differ if needed, e.g., an ID or slug
-								})
-							}
-							return choices
-						}(),
-					},
-					{
-						Name:        "workout-duration-distance",
-						Description: "Distance or Duration of the workout",
-						Type:        discordgo.ApplicationCommandOptionString, // TODO: Use discordgo.ApplicationCommandOptionNumber so it forces a number
-						Required:    true,
-					},
-					{
-						Name: "user",
-						Description: "User who completed the workout",
-						Type: discordgo.ApplicationCommandOptionString,
-						Required: false,
-						Choices: func() []*discordgo.ApplicationCommandOptionChoice {
-							var choices []*discordgo.ApplicationCommandOptionChoice
-							for _, user := range userList {
-								choices = append(choices, &discordgo.ApplicationCommandOptionChoice{
-									Name:  user,
-									Value: user, // The value could differ if needed, e.g., an ID or slug
-								})
-							}
-							return choices
-						}(),
-					},
+	// Define commands
+	commands := []*discordgo.ApplicationCommand{
+		{
+			Name:        "workout",
+			Description: "Adds a new workout for the current day",
+			Options: []*discordgo.ApplicationCommandOption{
+				{
+					Name:        "workout-category",
+					Description: "Type of workout completed",
+					Type:        discordgo.ApplicationCommandOptionString,
+					Required:    true,
+					Choices: func() []*discordgo.ApplicationCommandOptionChoice {
+						var choices []*discordgo.ApplicationCommandOptionChoice
+						for _, category := range workoutCategories {
+							choices = append(choices, &discordgo.ApplicationCommandOptionChoice{
+								Name:  category.CategoryName,
+								Value: category.CategoryName,
+							})
+						}
+						return choices
+					}(),
+				},
+				{
+					Name:        "workout-duration-distance",
+					Description: "Distance or Duration of the workout",
+					Type:        discordgo.ApplicationCommandOptionString,
+					Required:    true,
+				},
+				{
+					Name:        "user",
+					Description: "User who completed the workout",
+					Type:        discordgo.ApplicationCommandOptionString,
+					Required:    false,
+					Choices: func() []*discordgo.ApplicationCommandOptionChoice {
+						var choices []*discordgo.ApplicationCommandOptionChoice
+						for _, user := range userList {
+							choices = append(choices, &discordgo.ApplicationCommandOptionChoice{
+								Name:  user,
+								Value: user,
+							})
+						}
+						return choices
+					}(),
 				},
 			},
-		}
+		},
+	}
 
-		// Register the commands
-		for _, cmd := range commands {
-			log.Printf("Command Name: %v", cmd.Name)
-			_, err := s.ApplicationCommandCreate(s.State.User.ID, "", cmd)
-			if err != nil {
-				log.Printf("Cannot create '%v' command: %v", cmd.Name, err)
-			}
+	// TODO: Might want to clear the commands out before the start of every bot to make sure they are updated here
+
+	// Register commands (use a guild for instant updates)
+	for _, cmd := range commands {
+		_, err := DiscordSession.ApplicationCommandCreate(DiscordSession.State.User.ID, constants.WorkoutGangServerId, cmd) // Register as guild command
+		if err != nil {
+			log.Printf("Cannot create '%v' command: %v", cmd.Name, err)
 		}
-	})
+	}
+
+	log.Println("Commands registered successfully")
+	return nil
 }
 
 func handleCommand(s *discordgo.Session, i *discordgo.InteractionCreate) {
@@ -105,3 +110,5 @@ func handleCommand(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		fmt.Printf("No slash command found for %v\n", i.ApplicationCommandData().Name)
 	}
 }
+
+
