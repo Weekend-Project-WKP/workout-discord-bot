@@ -60,7 +60,6 @@ func WorkoutSlashCommandHandler(s *discordgo.Session, i *discordgo.InteractionCr
 		s.ChannelMessageSend(i.ChannelID, "This user isn't assigned to a team. Need a team my guy/gal/they.")
 	}
 
-	// username := i.Member.User.Username
 	points := helpers.CalculatePoints(workoutCategory.Points, workoutCategory.Measurement, measurement)
 
 	description := fmt.Sprintf("User `%v` logged a workout \n Category='%v' \n Duration/Length='%v' \n Points: '%v' \n Team='%v'", username, category, measurement, points, teamName)
