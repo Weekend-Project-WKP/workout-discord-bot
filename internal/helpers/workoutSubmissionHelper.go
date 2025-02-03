@@ -86,3 +86,29 @@ func GetTeamName(s *discordgo.Session, guildId string, userId string) (string, e
 	}
 	return "", fmt.Errorf("no team found for this user")
 }
+
+// FindOption searches for an option by name in a slice of options.
+func FindOption(options []*discordgo.ApplicationCommandInteractionDataOption, name string) *discordgo.ApplicationCommandInteractionDataOption {
+	for _, opt := range options {
+		if opt.Name == name {
+			return opt
+		}
+	}
+	return nil
+}
+
+// GetUserIDByUsername searches for a user by their username in a guild
+func GetUserIDByUsername(s *discordgo.Session, guildID, username string) (string, error) {
+	members, err := s.GuildMembersSearch(guildID, username, 100) // Max 100 results
+	if err != nil {
+		return "", err
+	}
+
+	// Loop through results and match exact username
+	for _, member := range members {
+		if member.User.Username == username {
+			return member.User.ID, nil
+		}
+	}
+	return "", fmt.Errorf("user not found")
+}

@@ -5,6 +5,7 @@ import (
 	"log"
 	"strconv"
 	"time"
+	"workoutbot/internal/constants"
 	"workoutbot/internal/db"
 	"workoutbot/internal/helpers"
 	"workoutbot/internal/models"
@@ -14,30 +15,51 @@ import (
 )
 
 func WorkoutSlashCommandHandler(s *discordgo.Session, i *discordgo.InteractionCreate){
+	data := i.ApplicationCommandData()
+	
+	// Find the category
+	category := helpers.FindOption(data.Options, "workout-category").StringValue()
+	log.Printf("Slash Command Category: '%v'", category)
+
+	// Find the measurement
+	measurement, errMeasurment := strconv.ParseFloat(helpers.FindOption(data.Options, "workout-duration-distance").StringValue(), 64)
+	if errMeasurment != nil {
+		fmt.Println("Error converting measurement string to float:", errMeasurment)
+		return
+	}
+	log.Printf("Slash Command Measurement: '%v'", measurement)
+
+	// Find the user
+	var username string
+	choiceUser := helpers.FindOption(data.Options, "user")
+	if choiceUser == nil {
+		username = i.Member.User.Username
+	} else {
+		username = choiceUser.StringValue()
+	}
+	log.Printf("Slash Command Username: '%v'", username)
+
 	// Get the Workout Category from the DB using the slash command option
-	category := i.ApplicationCommandData().Options[0].StringValue()
 	workoutCategory, errWorkoutCategory:= db.WorkoutCategoryGetOne(category)
 	if errWorkoutCategory != nil {
 		log.Printf("Error gathering workout category '%v' 'WorkoutSlashCommandHandler' command: %v", category, errWorkoutCategory)
 	}
 
-	// Get the measurement from the 2nd slash command option
-	measurement, errMeasurment := strconv.ParseFloat(i.ApplicationCommandData().Options[1].StringValue(), 64) //TODO: Update to pull from a Number Value once the SlashComandHandler is updated
-	if errMeasurment != nil {
-		fmt.Println("Error converting measurement string to float:", errMeasurment)
+	// Get UserId By Username
+	userId, errUserId := helpers.GetUserIDByUsername(s, constants.WorkoutGangServerId, username)
+	if errUserId != nil {
+		log.Println("User not found:", errUserId)
 		return
+	} else {
+		fmt.Println("User ID:", userId)
 	}
-
-	log.Printf("Interaction Guild Id: '%v'", i.GuildID)
-	log.Printf("Interaction Message Author Id: '%v'", i.Member.User.ID)
 	
 	// Get the user team name which is set to the current user role (guild id)
-	teamName, errTeamName := helpers.GetTeamName(s, i.GuildID, i.Member.User.ID)
+	teamName, errTeamName := helpers.GetTeamName(s, i.GuildID, userId)
 	if errTeamName != nil {
 		s.ChannelMessageSend(i.ChannelID, "This user isn't assigned to a team. Need a team my guy/gal/they.")
 	}
 
-	username := i.Member.User.Username
 	points := helpers.CalculatePoints(workoutCategory.Points, workoutCategory.Measurement, measurement)
 
 	description := fmt.Sprintf("User `%v` logged a workout \n Category='%v' \n Duration/Length='%v' \n Points: '%v' \n Team='%v'", username, category, measurement, points, teamName)
