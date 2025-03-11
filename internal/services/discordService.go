@@ -33,7 +33,7 @@ func InitializeDiscordGo() error {
 func InitializeAiPartner() {
 	AiContext = context.Background()
 	AiClient, AiError = genai.NewClient(AiContext, option.WithAPIKey(os.Getenv("GEMINI_API_KEY")))
-	AiModel = AiClient.GenerativeModel("gemini-1.5-flash")
+	AiModel = AiClient.GenerativeModel("gemini-2.0-flash")
 }
 
 func FatalSessionClosing() {
