@@ -28,11 +28,11 @@ func CreateWorkoutsViaString(workoutString string, guildId string, messageId str
 			// TODO - Figure out how to remove all the blank lines from AI
 			if line != "" {
 				lineItemSplit := strings.Split(line, "'")
-				if strings.Contains(line, "Workout Summary") {
+				if strings.Contains(strings.ToLower(line), "workout summary") {
 					// First Line for Info
 					username = lineItemSplit[1]
 					teamname = lineItemSplit[3]
-				} else if strings.Contains(line, "Category") {
+				} else if strings.Contains(strings.ToLower(line), "category") {
 					// Following Lines for Workouts
 					durationInt, _ := strconv.ParseFloat(lineItemSplit[3], 64)
 					workouts = append(workouts, models.Workout{

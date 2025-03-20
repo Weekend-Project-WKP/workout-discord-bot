@@ -16,5 +16,7 @@ func SubmitWorkout(s *discordgo.Session, r *discordgo.MessageReactionAdd) {
 		return
 	} else if len(workouts) > 0 {
 		helpers.LogWorkouts(s, workouts, r.ChannelID, workouts[0].TeamName)
+	} else if len(workouts) == 0 {
+		s.ChannelMessageSend(r.ChannelID, "Issue logging this score. Something may be wrong with the structure of the message.")
 	}
 }
