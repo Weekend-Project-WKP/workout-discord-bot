@@ -109,10 +109,11 @@ func isAiAvailable(aiError error, s *discordgo.Session, channelId string) bool {
 }
 
 func getCategoriesForAiPrompt() string {
-	accumulatingCategoryPrompt := "The categories are:  "
+	accumulatingCategoryPrompt := "These are the categories and what they are measured in: "
 	workoutCategoryMap, _ := db.WorkoutCategoryGetAll()
 	for _, value := range workoutCategoryMap {
 		accumulatingCategoryPrompt += value.CategoryName + " measured in " + value.MeasurementQuantification + ". "
 	}
+	accumulatingCategoryPrompt = accumulatingCategoryPrompt + " If you can't get the correct measurement from the workout, say there is an issue."
 	return accumulatingCategoryPrompt
 }
