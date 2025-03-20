@@ -44,6 +44,9 @@ func CreateWorkoutsViaString(workoutString string, guildId string, messageId str
 						MessageId:         messageId + "-" + strconv.Itoa(i),
 						WorkoutEntryTime:  primitive.NewDateTimeFromTime(messageTs.UTC()),
 						TeamName:          teamname})
+				} else {
+					workouts = nil
+					break
 				}
 			}
 		}
