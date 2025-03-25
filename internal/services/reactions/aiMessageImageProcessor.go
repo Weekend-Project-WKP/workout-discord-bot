@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"time"
 	"workoutbot/internal/constants"
 	"workoutbot/internal/db"
 	"workoutbot/internal/helpers"
@@ -47,7 +48,8 @@ func GetAiSummary(s *discordgo.Session, r *discordgo.MessageReactionAdd, model *
 		textContext = textContext + message.Content
 	}
 	textContext = textContext + "The team name is " + teamName + ". "
-	textContext = textContext + "The user name is " + message.Author.Username + "."
+	textContext = textContext + "The user name is " + message.Author.Username + ". "
+	textContext = textContext + "The workout datetime is " + message.Timestamp.Format(time.RFC3339) + "."
 	processMessageAndAttachment(textContext, message, r.ChannelID, s, model, ctx)
 }
 func getFile(fileUrl string) ([]byte, error) {
