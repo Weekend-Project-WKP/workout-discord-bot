@@ -9,7 +9,7 @@ import (
 
 func SubmitWorkout(s *discordgo.Session, r *discordgo.MessageReactionAdd) {
 	message, _ := s.ChannelMessage(r.ChannelID, r.MessageID)
-	workouts, dbErr := helpers.CreateWorkoutsViaString(message.Content, r.GuildID, r.MessageID, message.Timestamp)
+	workouts, dbErr := helpers.CreateWorkoutsViaString(message.Content, r.GuildID, r.MessageID)
 	if dbErr != nil {
 		fmt.Println(dbErr)
 		s.ChannelMessageSend(r.ChannelID, dbErr.Error())

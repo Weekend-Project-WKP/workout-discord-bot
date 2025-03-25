@@ -18,11 +18,11 @@ Workout Summary for 'User_name' 'Team 1'
 Category="Run/Walk" Duration/Length="1" mile
 Category="Sports" Duration/Length="15" minutes
 */
-func CreateWorkoutsViaString(workoutString string, guildId string, messageId string, messageTs time.Time) ([]models.Workout, error) {
+func CreateWorkoutsViaString(workoutString string, guildId string, messageId string) ([]models.Workout, error) {
 	workoutCategoryMap, err := db.WorkoutCategoryGetAll()
 	var workouts []models.Workout
 	if err == nil {
-		username, teamname := "", ""
+		username, teamname, entryTime := "", "", ""
 		for i, line := range strings.Split(workoutString, "\n") {
 			// Blank Line skipping.
 			// TODO - Figure out how to remove all the blank lines from AI
@@ -32,9 +32,11 @@ func CreateWorkoutsViaString(workoutString string, guildId string, messageId str
 					// First Line for Info
 					username = lineItemSplit[1]
 					teamname = lineItemSplit[3]
+					entryTime = lineItemSplit[5]
 				} else if strings.Contains(strings.ToLower(line), "category") {
 					// Following Lines for Workouts
 					durationInt, _ := strconv.ParseFloat(lineItemSplit[3], 64)
+					dateTimeValue, _ := time.Parse(time.RFC3339, entryTime)
 					workouts = append(workouts, models.Workout{
 						Points:            CalculatePoints(workoutCategoryMap[lineItemSplit[1]].Points, workoutCategoryMap[lineItemSplit[1]].Measurement, durationInt),
 						DiscordUserName:   username,
@@ -42,7 +44,7 @@ func CreateWorkoutsViaString(workoutString string, guildId string, messageId str
 						Description:       line,
 						WorkoutCategoryId: workoutCategoryMap[lineItemSplit[1]].Id,
 						MessageId:         messageId + "-" + strconv.Itoa(i),
-						WorkoutEntryTime:  primitive.NewDateTimeFromTime(messageTs.UTC()),
+						WorkoutEntryTime:  primitive.NewDateTimeFromTime(dateTimeValue.UTC()),
 						TeamName:          teamname})
 				} else {
 					workouts = nil
